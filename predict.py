@@ -1,11 +1,20 @@
 import numpy as np
+import os
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv3D, MaxPooling3D
 from keras.utils import np_utils
 from keras.callbacks import ModelCheckpoint
+from keras import backend as K
 
 model = Sequential()
+
+def set_keras_backend(backend):
+
+    if K.backend() != backend:
+        os.environ['KERAS_BACKEND'] = backend
+        reload(K)
+        assert K.backend() == backend
 
 def print_files(filename):
     data = np.load(filename)
@@ -47,6 +56,7 @@ def predict(test_data):
 if __name__ == "__main__":
     train_X = np.load("train_X.npy")
     train_Y = np.load("train_binary_Y.npy")
+    set_keras_backend("theano")
     create_convolution(train_X, train_Y)
     test_x = np.load("valid_test_X.npy")
     predict(test_x)
